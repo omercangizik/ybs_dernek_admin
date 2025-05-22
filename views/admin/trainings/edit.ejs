@@ -1,0 +1,58 @@
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Eğitim Düzenle</h1>
+        <a href="/admin/trainings" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Geri Dön
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form action="/admin/trainings/<%= training.id %>" method="POST">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="title">Eğitim Adı</label>
+                            <input type="text" class="form-control" id="title" name="title" value="<%= training.title %>" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="location">Konum</label>
+                            <input type="text" class="form-control" id="location" name="location" value="<%= training.location %>" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="start_date">Başlangıç Tarihi</label>
+                            <input type="datetime-local" class="form-control" id="start_date" name="start_date" value="<%= training.start_date.toISOString().slice(0, 16) %>" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="end_date">Bitiş Tarihi</label>
+                            <input type="datetime-local" class="form-control" id="end_date" name="end_date" value="<%= training.end_date.toISOString().slice(0, 16) %>" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Açıklama</label>
+                    <textarea class="form-control" id="description" name="description" rows="4" required><%= training.description %></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="capacity">Katılımcı Kapasitesi</label>
+                    <input type="number" class="form-control" id="capacity" name="capacity" value="<%= training.capacity %>" min="1" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Kaydet
+                </button>
+            </form>
+        </div>
+    </div>
+</div> 

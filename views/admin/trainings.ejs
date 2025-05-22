@@ -1,0 +1,137 @@
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Eğitim Yönetimi</h2>
+        <a href="/admin/trainings/new" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Yeni Eğitim
+        </a>
+    </div>
+
+    <!-- Search -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form action="/admin/trainings" method="GET" class="row g-3">
+                <div class="col-md-6">
+                    <input type="text" class="form-control" name="search" placeholder="Eğitim adı veya açıklama ara..." value="<%= search %>">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Ara</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Trainings Table -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="trainingsTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Eğitim Adı</th>
+                            <th>Açıklama</th>
+                            <th>Başlangıç</th>
+                            <th>Bitiş</th>
+                            <th>Katılımcı</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (trainings && trainings.length > 0) { %>
+                            <% trainings.forEach(training => { %>
+                                <tr>
+                                    <td><%= training.id %></td>
+                                    <td><%= training.title %></td>
+                                    <td><%= training.description ? training.description.substring(0, 50) + '...' : '' %></td>
+                                    <td><%= new Date(training.start_date).toLocaleDateString('tr-TR') %></td>
+                                    <td><%= new Date(training.end_date).toLocaleDateString('tr-TR') %></td>
+                                    <td><%= training.participant_count || 0 %></td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-info" 
+                                                    onclick="editTraining(<%= training.id %>)">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger" 
+                                                    onclick="deleteTraining(<%= training.id %>)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="7" class="text-center">Henüz eğitim bulunmamaktadır.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Eğitim Silme</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Bu eğitimi silmek istediğinizden emin misiniz?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">Sil</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function editTraining(trainingId) {
+    window.location.href = `/admin/trainings/${trainingId}/edit`;
+}
+
+function deleteTraining(trainingId) {
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    const confirmBtn = document.getElementById('confirmDelete');
+    
+    confirmBtn.onclick = () => {
+        fetch(`/admin/trainings/${trainingId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Eğitim silinirken bir hata oluştu.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Bir hata oluştu.');
+        });
+        
+        modal.hide();
+    };
+    
+    modal.show();
+}
+
+// Initialize DataTable
+$(document).ready(function() {
+    $('#trainingsTable').DataTable({
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Turkish.json'
+        }
+    });
+});
+</script> 

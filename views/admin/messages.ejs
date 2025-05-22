@@ -1,0 +1,201 @@
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Mesaj Yönetimi</h2>
+    </div>
+
+    <!-- Search -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form action="/admin/messages" method="GET" class="row g-3">
+                <div class="col-md-6">
+                    <input type="text" class="form-control" name="search" placeholder="Gönderen adı veya mesaj içeriği ara..." value="<%= search %>">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Ara</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Messages Table -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="messagesTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Gönderen</th>
+                            <th>E-posta</th>
+                            <th>Konu</th>
+                            <th>Mesaj</th>
+                            <th>Tarih</th>
+                            <th>Durum</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (messages && messages.length > 0) { %>
+                            <% messages.forEach(message => { %>
+                                <tr>
+                                    <td><%= message.id %></td>
+                                    <td><%= message.name %></td>
+                                    <td><%= message.email %></td>
+                                    <td><%= message.subject %></td>
+                                    <td><%= message.message.substring(0, 50) + '...' %></td>
+                                    <td><%= new Date(message.created_at).toLocaleDateString('tr-TR') %></td>
+                                    <td>
+                                        <span class="badge bg-<%= message.is_read ? 'success' : 'warning' %>">
+                                            <%= message.is_read ? 'Okundu' : 'Okunmadı' %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-info" 
+                                                    onclick="viewMessage(<%= message.id %>)">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger" 
+                                                    onclick="deleteMessage(<%= message.id %>)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="8" class="text-center">Henüz mesaj bulunmamaktadır.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Message View Modal -->
+<div class="modal fade" id="messageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Mesaj Detayı</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <strong>Gönderen:</strong>
+                    <span id="messageName"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>E-posta:</strong>
+                    <span id="messageEmail"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Konu:</strong>
+                    <span id="messageSubject"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Mesaj:</strong>
+                    <p id="messageContent" class="mt-2"></p>
+                </div>
+                <div class="mb-3">
+                    <strong>Tarih:</strong>
+                    <span id="messageDate"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                <a href="#" id="replyEmail" class="btn btn-primary">
+                    <i class="fas fa-reply"></i> Yanıtla
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Mesaj Silme</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Bu mesajı silmek istediğinizden emin misiniz?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">Sil</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function viewMessage(messageId) {
+    fetch(`/admin/messages/${messageId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const message = data.message;
+                document.getElementById('messageName').textContent = message.name;
+                document.getElementById('messageEmail').textContent = message.email;
+                document.getElementById('messageSubject').textContent = message.subject;
+                document.getElementById('messageContent').textContent = message.message;
+                document.getElementById('messageDate').textContent = new Date(message.created_at).toLocaleString('tr-TR');
+                document.getElementById('replyEmail').href = `mailto:${message.email}?subject=RE: ${message.subject}`;
+                
+                const modal = new bootstrap.Modal(document.getElementById('messageModal'));
+                modal.show();
+            } else {
+                alert('Mesaj yüklenirken bir hata oluştu.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Bir hata oluştu.');
+        });
+}
+
+function deleteMessage(messageId) {
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    const confirmBtn = document.getElementById('confirmDelete');
+    
+    confirmBtn.onclick = () => {
+        fetch(`/admin/messages/${messageId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Mesaj silinirken bir hata oluştu.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Bir hata oluştu.');
+        });
+        
+        modal.hide();
+    };
+    
+    modal.show();
+}
+
+// Initialize DataTable
+$(document).ready(function() {
+    $('#messagesTable').DataTable({
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Turkish.json'
+        }
+    });
+});
+</script> 

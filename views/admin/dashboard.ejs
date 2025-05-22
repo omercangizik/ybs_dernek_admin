@@ -1,0 +1,91 @@
+<div class="container-fluid py-4">
+    <h2 class="mb-4">Dashboard</h2>
+    
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Toplam Üye</h5>
+                    <p class="card-text display-4"><%= stats ? stats.total_users : 0 %></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Toplam Etkinlik</h5>
+                    <p class="card-text display-4"><%= stats ? stats.total_events : 0 %></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Toplam Eğitim</h5>
+                    <p class="card-text display-4"><%= stats ? stats.total_trainings : 0 %></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Toplam İş İlanı</h5>
+                    <p class="card-text display-4"><%= stats ? stats.total_jobs : 0 %></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Hızlı İşlemler</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="/admin/users/new" class="btn btn-primary btn-block w-100">
+                                <i class="fas fa-user-plus"></i> Yeni Kullanıcı
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/admin/events/new" class="btn btn-success btn-block w-100">
+                                <i class="fas fa-calendar-plus"></i> Yeni Etkinlik
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/admin/trainings/new" class="btn btn-info btn-block w-100">
+                                <i class="fas fa-plus-circle"></i> Yeni Eğitim
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/admin/jobs/new" class="btn btn-warning btn-block w-100">
+                                <i class="fas fa-plus"></i> Yeni İş İlanı
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.border-left-primary {
+    border-left: 4px solid #4e73df !important;
+}
+.border-left-success {
+    border-left: 4px solid #1cc88a !important;
+}
+.border-left-info {
+    border-left: 4px solid #36b9cc !important;
+}
+.border-left-warning {
+    border-left: 4px solid #f6c23e !important;
+}
+</style> 

@@ -1,0 +1,65 @@
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">İş İlanı Düzenle</h1>
+        <a href="/admin/jobs" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Geri Dön
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form action="/admin/jobs/<%= job.id %>" method="POST">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="title">İş İlanı Başlığı</label>
+                            <input type="text" class="form-control" id="title" name="title" value="<%= job.title %>" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="company">Şirket</label>
+                            <input type="text" class="form-control" id="company" name="company" value="<%= job.company %>" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="location">Konum</label>
+                            <input type="text" class="form-control" id="location" name="location" value="<%= job.location %>" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="deadline">Son Başvuru Tarihi</label>
+                            <input type="date" class="form-control" id="deadline" name="deadline" value="<%= job.deadline.toISOString().split('T')[0] %>" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">İş Tanımı</label>
+                    <textarea class="form-control" id="description" name="description" rows="4" required><%= job.description %></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="requirements">Gereksinimler</label>
+                    <textarea class="form-control" id="requirements" name="requirements" rows="4"><%= job.requirements %></textarea>
+                </div>
+
+                <div class="form-group">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="is_active" name="is_active" value="1" <%= job.is_active ? 'checked' : '' %>>
+                        <label class="custom-control-label" for="is_active">İlan Aktif</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Kaydet
+                </button>
+            </form>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,137 @@
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Etkinlik Yönetimi</h2>
+        <a href="/admin/events/new" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Yeni Etkinlik
+        </a>
+    </div>
+
+    <!-- Search -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form action="/admin/events" method="GET" class="row g-3">
+                <div class="col-md-6">
+                    <input type="text" class="form-control" name="search" placeholder="Etkinlik adı veya açıklama ara..." value="<%= search %>">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Ara</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Events Table -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="eventsTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Etkinlik Adı</th>
+                            <th>Açıklama</th>
+                            <th>Tarih</th>
+                            <th>Konum</th>
+                            <th>Katılımcı</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (events && events.length > 0) { %>
+                            <% events.forEach(event => { %>
+                                <tr>
+                                    <td><%= event.id %></td>
+                                    <td><%= event.title %></td>
+                                    <td><%= event.description ? event.description.substring(0, 50) + '...' : '' %></td>
+                                    <td><%= new Date(event.event_date).toLocaleDateString('tr-TR') %></td>
+                                    <td><%= event.location %></td>
+                                    <td><%= event.participant_count || 0 %></td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-info" 
+                                                    onclick="editEvent(<%= event.id %>)">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger" 
+                                                    onclick="deleteEvent(<%= event.id %>)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="7" class="text-center">Henüz etkinlik bulunmamaktadır.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Etkinlik Silme</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Bu etkinliği silmek istediğinizden emin misiniz?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">Sil</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function editEvent(eventId) {
+    window.location.href = `/admin/events/${eventId}/edit`;
+}
+
+function deleteEvent(eventId) {
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    const confirmBtn = document.getElementById('confirmDelete');
+    
+    confirmBtn.onclick = () => {
+        fetch(`/admin/events/${eventId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Etkinlik silinirken bir hata oluştu.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Bir hata oluştu.');
+        });
+        
+        modal.hide();
+    };
+    
+    modal.show();
+}
+
+// Initialize DataTable
+$(document).ready(function() {
+    $('#eventsTable').DataTable({
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Turkish.json'
+        }
+    });
+});
+</script> 
